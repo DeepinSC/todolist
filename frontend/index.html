@@ -15,9 +15,27 @@
 
       <link href="css/bootstrap.css" rel="stylesheet">
       <link href="css/font-awesome.css" rel="stylesheet">
-    <title>Title</title>
+      <link href="css/index.css" rel="stylesheet">
+    <title>Todolist</title>
 </head>
 <body>
+    <div class="container" id="main-container">
+        <h1>Todo List</h1>
+        <div>
+            <form>
+            <input placeholder="Create a thing to do" id="description" class="form-control" style="width: 20%">
+                <br>
+                <p>Importance:</p>
+                <label><input type="radio" name="importance">0 not important</label>
+                <label><input type="radio" name="importance">1 important</label>
+                <label><input type="radio" name="importance">2 very important</label>
+                <br>
+                <input type="date" ><input type="time">
+                <br>
+                <button type="submit" class="btn btn-primary">Create</button>
 
+                </form>
+        </div>
+    </div>
 </body>
 </html>
