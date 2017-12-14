@@ -106,4 +106,4 @@ ENV/
 # mypy
 .mypy_cache/
 
-django_blog/MLBlog/db.sqlite3
+backend/db.sqlite3

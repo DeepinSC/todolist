@@ -1,0 +1,28 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+.main-container{
+    width: 50%;
+    background-color: whitesmoke;
+    border: 1px solid black;
+
+}
+.new-container {
+    width: 100%;
+    background-color: silver;
+    border: 5px;
+
+}
+.list_container{
+    background-color: lavender;
+    border: 5px;
+}
+.box{
+    margin-top: 5px;
+    margin-left: 5px;
+}
+.form-control{
+    width: 60%;
+}
