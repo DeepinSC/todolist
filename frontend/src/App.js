@@ -116,7 +116,7 @@ class TodoNew extends Component{
             importance:this.state.importance,
             expire_time:this.state.expire_time,
             finished:false};
-
+        console.log(this.state.expire_time);
         $.ajax({
             url:"http://127.0.0.1:8000/todos/",
             type:"POST",
@@ -124,7 +124,6 @@ class TodoNew extends Component{
             async:false,
             data:submit_json,
             success: function(return_value){
-                        //window.location.href;
                     },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
                         alert(XMLHttpRequest.status);

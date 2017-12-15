@@ -1,8 +1,7 @@
 {
-  "name": "frontend1",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage" : "http://http://127.0.0.1:8000/todolist/",
   "dependencies": {
     "jquery": "^3.2.1",
     "react": "^16.2.0",
