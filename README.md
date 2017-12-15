@@ -30,7 +30,7 @@
 ### 列出所有的待办事项  
 ![image](https://github.com/DeepinSC/todolist/blob/master/demo/List.gif)
 ### 增加一个待办事项
-###[image](https://github.com/DeepinSC/todolist/blob/master/demo/Add.gif)
+![image](https://github.com/DeepinSC/todolist/blob/master/demo/Add.gif)
 ### 删除一个待办事项
 ![image](https://github.com/DeepinSC/todolist/blob/master/demo/Delete.gif)
 ### 编辑一个待办事项的具体内容、已完成、过期时间、优先级
