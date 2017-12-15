@@ -11,7 +11,7 @@ class Sort extends Component{
             sort_method:props.sort_method
         }
     }
-    
+
     render(){
         return(
             <div className="box" align="right">
@@ -26,15 +26,40 @@ class Sort extends Component{
     }
 }
 
+class Page extends Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            pages:props.pages
+        }
+    }
+
+
+    render(){
+        return(
+            <div className="box" align="right">
+                <div>Pages: {this.props.current_page}/{this.props.max_page} </div>
+                <Button bsStyle="info" name="pages" value="previous" onClick={this.props.handlePageChange}>Previous</Button>
+                &nbsp;
+                <Button bsStyle="info" name="pages" value="next" onClick={this.props.handlePageChange}>Next</Button>
+            </div>
+        )
+    }
+}
+
 class App extends Component {
     constructor(props){
         super(props);
         this.state = {
-            max_todo_per_page:5,
-            sort_method:0
+            pages:1,
+            sort_method:0,
+            total_todos:0
         };
         this.handleStateChange = this.handleStateChange.bind(this);
+        this.handlePageChange = this.handlePageChange.bind(this);
+
     }
+
 
     handleStateChange(event){
         const target = event.target;
@@ -45,6 +70,17 @@ class App extends Component {
         }
         );
     }
+    handlePageChange(event){
+        const target = event.target;
+        const value = (target.value==="next")?1:-1;
+        const current_page = this.state.pages;
+        this.setState({
+        pages: (current_page+value)>0?current_page+value:current_page
+        }
+        );
+        console.log(this.state.pages);
+    }
+
 
   render() {
     return (
@@ -54,9 +90,9 @@ class App extends Component {
             <TodoNew/>
             <hr/>
             <h2>Todos:</h2>
-            <ListTodo sort_method={this.state.sort_method}/>
-            <Sort sort_method={this.state.sort_method} handleStateChange={this.handleStateChange}/>
-            <Page />
+            <Sort sort_method={this.state.sort_method} handleStateChange={this.handleStateChange} />
+            <ListTodo sort_method={this.state.sort_method} pages={this.state.pages} handlePageChange={this.handlePageChange}/>
+
         </div>
     );
   }
@@ -153,7 +189,7 @@ class TodoDetail extends Component{
         return "Unfinished";
     }
 
-    //删除todo函数
+    //todo删除函数
     handleDelete() {
                     var id = this.props.todo.id;
                     var delete_url = "http://127.0.0.1:8000/todos/"+id+"/";
@@ -204,6 +240,7 @@ class ListTodo extends Component{
         this.state={
             todos:[],
         };
+
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
@@ -242,25 +279,32 @@ class ListTodo extends Component{
     }
 
     render(){
-        console.log("ri"+this.props.sort_method);
+
         var todos = this.state.todos;
+        const max_todos_per_page=5;
+        const max_page = Math.ceil(todos.length/max_todos_per_page);
+
+
+
         if (this.props.sort_method==="0"){
             todos.sort((todoA, todoB) => todoB.importance - todoA.importance);
         }
-        if (this.props.sort_method==="1"){
+        else if (this.props.sort_method==="1"){
             todos.sort((todoA, todoB) => new Date(todoB.expire_date)>new Date(todoA.expire_date)?1:-1);
-            console.log(todos);
         }
 
-
-
+        var current_page = (this.props.pages>max_page)?max_page:((this.props.pages>0)?this.props.pages:1);
+        todos = todos.slice(max_todos_per_page*(current_page-1),max_todos_per_page*(current_page-1)+5);
 
         var todolist = todos.map(todo => <TodoDetail key = {todo.id} todo = {todo} handleInputChange={this.handleInputChange}/>);
 
         return(
+            <div>
             <ul id="todo_list">
                 {todolist}
             </ul>
+                <Page current_page = {current_page} max_page = {max_page} handlePageChange={this.props.handlePageChange}/>
+            </div>
         )
     }
 
@@ -290,16 +334,5 @@ class ListTodo extends Component{
 
 
 
-class Page extends Component{
-    render(){
-        return(
-            <div className="box" align="right">
-                <Button bsStyle="info">Previous</Button>
-                &nbsp;
-                <Button bsStyle="info">Next</Button>
-            </div>
-        )
-    }
-}
 
 export default App;
