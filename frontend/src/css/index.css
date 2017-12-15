@@ -4,13 +4,11 @@ body {
   font-family: sans-serif;
 }
 .main-container{
-    width: 50%;
     background-color: whitesmoke;
     border: 1px solid black;
 
 }
 .new-container {
-    width: 100%;
     background-color: silver;
     border: 5px;
 
@@ -18,11 +16,19 @@ body {
 .list_container{
     background-color: lavender;
     border: 5px;
+
+}
+.todo_detail{
+    float: left;
 }
 .box{
     margin-top: 5px;
     margin-left: 5px;
 }
-.form-control{
+.form-control-bar{
     width: 60%;
+}
+.finished-checkbox{
+    width: 40px;
+    height: 40px;
 }

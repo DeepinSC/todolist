@@ -3,18 +3,59 @@ import './css/index.css';
 import { Button } from 'react-bootstrap';
 import $ from 'jquery';
 
+
+class Sort extends Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            sort_method:props.sort_method
+        }
+    }
+    
+    render(){
+        return(
+            <div className="box" align="right">
+                Sort by:  &nbsp;
+                <input type="radio" name="sort_method" defaultChecked={this.state.sort_method===0} onChange={this.props.handleStateChange} value="0"/>
+                <label> Importance</label>
+                <input type="radio" name="sort_method" defaultChecked={this.state.sort_method===1} onChange={this.props.handleStateChange} value="1"/>
+                <label> Expire time</label>
+                &nbsp;
+            </div>
+        )
+    }
+}
+
 class App extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+            max_todo_per_page:5,
+            sort_method:0
+        };
+        this.handleStateChange = this.handleStateChange.bind(this);
+    }
+
+    handleStateChange(event){
+        const target = event.target;
+        const value = target.value;
+        const name = target.name;
+        this.setState({
+        [name]: value
+        }
+        );
+    }
+
   render() {
     return (
-
         <div className="new-container" id="new-todo">
             <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" />
-            <h2>Create a new todo:</h2>
+            <h2>Create a new todo :</h2>
             <TodoNew/>
             <hr/>
             <h2>Todos:</h2>
-            <ListTodo/>
-            <Sort />
+            <ListTodo sort_method={this.state.sort_method}/>
+            <Sort sort_method={this.state.sort_method} handleStateChange={this.handleStateChange}/>
             <Page />
         </div>
     );
@@ -34,8 +75,12 @@ class TodoNew extends Component{
         this.handleInputChange = this.handleInputChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
-    handleSubmit(event) {
-        var submit_json = {description:this.state.description,importance:this.state.importance,expire_time:this.state.expire_time,finished:false};
+    handleSubmit() {
+        var submit_json = {description:this.state.description,
+            importance:this.state.importance,
+            expire_time:this.state.expire_time,
+            finished:false};
+
         $.ajax({
             url:"http://127.0.0.1:8000/todos/",
             type:"POST",
@@ -60,7 +105,9 @@ class TodoNew extends Component{
   }
     render(){
         return(
-            <div class = "box">
+
+            <div className = "box">
+
             <form onSubmit={this.handleSubmit}>
                 <p>Description:</p>
                 <input placeholder="Create a todo" name="description" className="form-control form-control-bar" value={this.state.description} onChange={this.handleInputChange} required={true} />
@@ -79,34 +126,136 @@ class TodoNew extends Component{
     }
 }
 
+class TodoDetail extends Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            description:props.todo.description,
+            importance:props.todo.importance,
+            expire_time:props.todo.expire_date,
+            finished:props.todo.finished
+        };
+        this.handleDelete = this.handleDelete.bind(this);
+        this.is_expired = this.is_expired.bind(this);
+    }
+
+    is_expired(){
+        const today=new Date();
+        const expire_date = new Date(this.state.expire_time);
+        return expire_date<today;
+    }
+
+    get_status(){
+        if (this.is_expired())
+            return "Expired";
+        if (this.state.finished)
+            return "Finished";
+        return "Unfinished";
+    }
+
+    //删除todo函数
+    handleDelete() {
+                    var id = this.props.todo.id;
+                    var delete_url = "http://127.0.0.1:8000/todos/"+id+"/";
+                    $.ajax({
+                        url:delete_url,
+                        type:"DELETE",
+                        dataType:"json",
+                        async:false,
+                        success: function(return_value){
+                                    //window.location.href;
+                                },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                    alert(XMLHttpRequest.status);
+                        }
+                    });
+                }
+
+    render(){
+        const todo = this.props.todo;
+        return(
+            <div className= "list_container">
+                    <form id ={todo.id}>
+                        <div>Finished: </div><input type="checkbox" name="finished" className="finished-checkbox" defaultChecked={this.state.finished} disabled={this.is_expired()} onChange={this.props.handleInputChange}/>
+                        <div>Description: </div>
+                        <input placeholder="Create a todo" name="description" className="form-control" ref="inputnew" defaultValue={this.state.description} onChange={this.props.handleInputChange} disabled={this.is_expired()} required={true} />
+                        <br/>
+                        <div className="todo_detail">Importance: </div>
+                        <input type="radio" name="importance" defaultChecked={this.state.importance===0} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="0"/><label>0 not important </label>
+                        <input type="radio" name="importance" defaultChecked={this.state.importance===1} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="1"/><label>1 important </label>
+                        <input type="radio" name="importance" defaultChecked={this.state.importance===2} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="2"/><label>2 very important </label>
+                        <br/>
+                        <div className="todo_detail">Expire Time: </div>
+                        <input type="date" name="expire_date" defaultValue={this.state.expire_time} onChange={this.props.handleInputChange}/>
+                        <br/>
+                        <Button type="submit" bsStyle="danger" onClick={this.handleDelete}>Delete</Button>
+                        <hr/>
+                        <div>Status: {this.get_status()}</div>
+                    </form>
+                    <hr/>
+                </div>
+        )
+    }
+}
+
 class ListTodo extends Component{
     constructor(props){
         super(props);
         this.state={
-            todos:[]
+            todos:[],
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     handleInputChange(event) {
         const target = event.target;
-        const value = target.type === 'radio' ? target.value : target.value;
+        let value=target.value;
+        if(target.type === 'checkbox') {
+            value = target.checked;
+        }
         const name = target.name;
+        const target_id = target.parentNode.id;
+        let todos_after = this.state.todos;
+        const index = todos_after.findIndex(todo=>(todo.id==target_id));
+        todos_after[index][name]=value;
+        const url = todos_after[index].url;
+
+        //每一次编辑都会向服务器提交更改请求
+        $.ajax({
+                        url:url,
+                        type:"PUT",
+                        dataType:"json",
+                        data:todos_after[index],
+                        async:false,
+                        success: function(return_value){
+                                    //window.location.reload();
+                                },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                    alert(XMLHttpRequest.status);
+                        }
+                    });
+
         this.setState({
-          [name]: value
+          todos: todos_after
         });
+
     }
 
     render(){
+        console.log("ri"+this.props.sort_method);
         var todos = this.state.todos;
-        var todolist = todos.map(
-            function (todo) {
+        if (this.props.sort_method==="0"){
+            todos.sort((todoA, todoB) => todoB.importance - todoA.importance);
+        }
+        if (this.props.sort_method==="1"){
+            todos.sort((todoA, todoB) => new Date(todoB.expire_date)>new Date(todoA.expire_date)?1:-1);
+            console.log(todos);
+        }
 
-                //var expire_date = todo.expire_date;
-                return(
-                <TodoDetail todo = {todo} handleInputChange={todo.handleInputChange}/>
-                )
-            });
+
+
+
+        var todolist = todos.map(todo => <TodoDetail key = {todo.id} todo = {todo} handleInputChange={this.handleInputChange}/>);
 
         return(
             <ul id="todo_list">
@@ -115,7 +264,7 @@ class ListTodo extends Component{
         )
     }
 
-    componentWillMount(){
+    componentDidMount(){
         var return_value;
         const _this = this;
         $.ajax({
@@ -137,90 +286,14 @@ class ListTodo extends Component{
     }
 }
 
-class TodoDetail extends Component{
-    constructor(props){
-        super(props);
-        const todo  = props.todo;
-        this.state = {
-            description:todo.description,
-            importance:todo.importance,
-            expire_time:todo.expire_date,
-            finished:todo.finished
-        };
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
-    }
 
-    handleInputChange(event) {
-        const target = event.target;
-        const value = target.type === 'radio' ? target.value : target.value;
-        const name = target.name;
-        this.setState({
-          [name]: value
-        });
-    }
 
-    handleDelete() {
-                    var id = this.props.todo.id;
-                    var delete_url = "http://127.0.0.1:8000/todos/"+id+"/";
-                    $.ajax({
-                        url:delete_url,
-                        type:"DELETE",
-                        dataType:"json",
-                        async:false,
-                        success: function(return_value){
-                                    //window.location.href;
-                                },
-                        error: function(XMLHttpRequest, textStatus, errorThrown) {
-                                    alert(XMLHttpRequest.status);
-                        }
-                    });
-                }
 
-    render(){
-        const todo = this.props.todo;
-        return(
-            <div id ={todo.id} className= "list_container">
-                    <form>
-                        <h3>Finished: <input type="checkbox" checked={todo.finished}/></h3>
-                        <p>Description:</p>
-                        <input placeholder="Create a todo" id="description" className="form-control" ref="inputnew" value={this.state.description} required={true} />
-                        <br/>
-                        <p>Importance:</p>
-                        <label><input type="radio" name="importance" checked={this.state.importance===0} onChange={this.state.handleInputChange}/>0 not important </label>
-                        <label><input type="radio" name="importance" checked={this.state.importance===1} onChange={this.state.handleInputChange}/>1 important </label>
-                        <label><input type="radio" name="importance" checked={this.state.importance===2} onChange={this.state.handleInputChange}/>2 very important </label>
-                        <p>Expire Time:</p>
-                        <input type="date" defaultValue={this.state.expire_time}/>
-                        <br/>
-                        <Button type="submit" bsStyle="danger" onClick={this.handleDelete}>Delete</Button>
-                    </form>
-                    <hr/>
-                </div>
-        )
-    }
-}
-
-class Sort extends Component{
-    render(){
-        return(
-            <div class="box" align="right">
-                Sort by:  &nbsp;
-                <select name="sort_method">
-                    <option value="0" >Importance</option>
-                    <option value="1" >Expire time</option>
-                </select>
-                &nbsp;
-                <Button bsStyle="primary">Sort</Button>
-            </div>
-        )
-    }
-}
 
 class Page extends Component{
     render(){
         return(
-            <div class="box" align="right">
+            <div className="box" align="right">
                 <Button bsStyle="info">Previous</Button>
                 &nbsp;
                 <Button bsStyle="info">Next</Button>
