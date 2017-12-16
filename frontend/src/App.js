@@ -4,6 +4,8 @@ import { Button } from 'react-bootstrap';
 import $ from 'jquery';
 
 
+
+//排序组件
 class Sort extends Component{
     constructor(props){
         super(props);
@@ -26,6 +28,7 @@ class Sort extends Component{
     }
 }
 
+//翻页组件
 class Page extends Component{
     constructor(props){
         super(props);
@@ -39,14 +42,15 @@ class Page extends Component{
         return(
             <div className="box" align="right">
                 <div>Pages: {this.props.current_page}/{this.props.max_page} </div>
-                <Button bsStyle="info" name="pages" value="previous" onClick={this.props.handlePageChange}>Previous</Button>
+                <button className="btn btn-info btn-op" name="pages" value="previous" onClick={this.props.handlePageChange}><i className="fa fa-chevron-left"></i> Previous</button>
                 &nbsp;
-                <Button bsStyle="info" name="pages" value="next" onClick={this.props.handlePageChange}>Next</Button>
+                <button className="btn btn-info btn-op" name="pages" value="next" onClick={this.props.handlePageChange}><i className="fa fa-chevron-right"></i> Next</button>
             </div>
         )
     }
 }
 
+//根组件
 class App extends Component {
     constructor(props){
         super(props);
@@ -84,9 +88,11 @@ class App extends Component {
 
   render() {
     return (
-        <div className="new-container" id="new-todo">
-            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css" />
+        <div  id="new-todo">
+
             <h2>Create a new todo :</h2>
+            <p>You are able to set a new todo with Descrption/Importance/Expire Time.</p>
+            <p><b>Note: If a todo has expired, you are forbidden to edit its props except expire time.</b></p>
             <TodoNew/>
             <hr/>
             <h2>Todos:</h2>
@@ -98,6 +104,8 @@ class App extends Component {
   }
 }
 
+
+//todo创建组件
 class TodoNew extends Component{
     constructor(props){
         super(props);
@@ -141,26 +149,29 @@ class TodoNew extends Component{
     render(){
         return(
 
-            <div className = "box">
-
+            <div className = "content-block parallax" id="services">
+            <div className="container">
             <form onSubmit={this.handleSubmit}>
-                <p>Description:</p>
-                <input placeholder="Create a todo" name="description" className="form-control form-control-bar" value={this.state.description} onChange={this.handleInputChange} required={true} />
+                <h1 className="text-center">Create Your New Todo</h1>
+                <h2>Description:</h2>
+                <input placeholder="Create a todo" name="description" className="form-control form-group form-control-white" value={this.state.description} onChange={this.handleInputChange} required={true} />
                 <br/>
-                <p>Importance:</p>
-                <label><input type="radio" name="importance" checked={this.state.importance==="0"} onChange={this.handleInputChange} value="0"/>0 not important </label>
-                <label><input type="radio" name="importance" checked={this.state.importance==="1"} onChange={this.handleInputChange} value="1"/>1 important </label>
-                <label><input type="radio" name="importance" checked={this.state.importance==="2"} onChange={this.handleInputChange} value="2"/>2 very important </label>
-                <p>Expire Time:</p>
-                <input type="date" name="expire_time" value={this.state.expire_time} onChange={this.handleInputChange}/>
+                <h2>Importance:</h2>
+                <input type="radio" name="importance" className="form-group "  checked={this.state.importance==="0"} onChange={this.handleInputChange} value="0"/><label>0 not important &nbsp;</label>
+                <input type="radio" name="importance" className="form-group"  checked={this.state.importance==="1"} onChange={this.handleInputChange} value="1"/><label>1 important &nbsp;</label>
+                <input type="radio" name="importance" className="form-group"  checked={this.state.importance==="2"} onChange={this.handleInputChange} value="2"/><label>2 very important &nbsp;</label>
+                <h2>Expire Time:</h2>
+                <input type="date" name="expire_time" className="form-group form-control form-control-white" value={this.state.expire_time} onChange={this.handleInputChange}/>
                 <br/>
-                <Button type="submit" bsStyle="primary">Create</Button>
+                <button type="submit" className="btn btn-o btn-lg">Create</button>
             </form>
+            </div>
             </div>
         )
     }
 }
 
+//todo详情组件
 class TodoDetail extends Component{
     constructor(props){
         super(props);
@@ -211,28 +222,35 @@ class TodoDetail extends Component{
         return(
             <div className= "list_container">
                     <form id ={todo.id}>
-                        <div>Finished: </div><input type="checkbox" name="finished" className="finished-checkbox" defaultChecked={this.state.finished} disabled={this.is_expired()} onChange={this.props.handleInputChange}/>
-                        <div>Description: </div>
-                        <input placeholder="Create a todo" name="description" className="form-control" ref="inputnew" defaultValue={this.state.description} onChange={this.props.handleInputChange} disabled={this.is_expired()} required={true} />
+                        <div className="title_bar">
+                        <h3 className="todo_detail">Finished: </h3>
+                        <input type="checkbox" name="finished" className="finished-checkbox form-group" defaultChecked={this.state.finished} disabled={this.is_expired()} onChange={this.props.handleInputChange}/>
+                        <h4 className="todo_detail_right">Status: {this.get_status()}</h4>
+                        </div>
                         <br/>
-                        <div className="todo_detail">Importance: </div>
-                        <input type="radio" name="importance" defaultChecked={this.state.importance===0} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="0"/><label>0 not important </label>
-                        <input type="radio" name="importance" defaultChecked={this.state.importance===1} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="1"/><label>1 important </label>
-                        <input type="radio" name="importance" defaultChecked={this.state.importance===2} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="2"/><label>2 very important </label>
+                        <div>
+                        <h3 >Description: </h3>
+                        <input placeholder="Create a todo" name="description" className="form-control form-group form-control-white" ref="inputnew" defaultValue={this.state.description} onChange={this.props.handleInputChange} disabled={this.is_expired()} required={true} />
                         <br/>
-                        <div className="todo_detail">Expire Time: </div>
-                        <input type="date" name="expire_date" defaultValue={this.state.expire_time} onChange={this.props.handleInputChange}/>
+                        <h3>Importance: </h3>
+                        <input type="radio" name="importance"  className="form-group" defaultChecked={this.state.importance===0} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="0"/><label>0 not important </label>
+                        <input type="radio" name="importance" className="form-group" defaultChecked={this.state.importance===1} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="1"/><label>1 important </label>
+                        <input type="radio" name="importance" className="form-group" defaultChecked={this.state.importance===2} onChange={this.props.handleInputChange} disabled={this.is_expired()} value="2"/><label>2 very important </label>
                         <br/>
-                        <Button type="submit" bsStyle="danger" onClick={this.handleDelete}>Delete</Button>
-                        <hr/>
-                        <div>Status: {this.get_status()}</div>
+                        <h3>Expire Time: </h3>
+                        <input type="date" name="expire_date" className="form-control form-group form-control-white" defaultValue={this.state.expire_time} onChange={this.props.handleInputChange}/>
+                        </div>
+                        <div>
+                            &nbsp; <button type="submit" className="btn btn-danger btn-op" onClick={this.handleDelete}><i className="fa fa-trash"></i> Delete</button>
+                        </div>
+
                     </form>
-                    <hr/>
                 </div>
         )
     }
 }
 
+//todo列表组件
 class ListTodo extends Component{
     constructor(props){
         super(props);
@@ -250,7 +268,7 @@ class ListTodo extends Component{
             value = target.checked;
         }
         const name = target.name;
-        const target_id = target.parentNode.id;
+        const target_id = target.parentNode.parentNode.id;
         let todos_after = this.state.todos;
         const index = todos_after.findIndex(todo=>(todo.id==target_id));
         todos_after[index][name]=value;
@@ -298,11 +316,11 @@ class ListTodo extends Component{
         var todolist = todos.map(todo => <TodoDetail key = {todo.id} todo = {todo} handleInputChange={this.handleInputChange}/>);
 
         return(
-            <div>
-            <ul id="todo_list">
+            <div className = "content-block parallax" id="contact">
+            <div class="container">
                 {todolist}
-            </ul>
                 <Page current_page = {current_page} max_page = {max_page} handlePageChange={this.props.handlePageChange}/>
+            </div>
             </div>
         )
     }
@@ -328,10 +346,6 @@ class ListTodo extends Component{
 
     }
 }
-
-
-
-
 
 
 export default App;

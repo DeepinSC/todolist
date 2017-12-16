@@ -14,12 +14,21 @@ body {
 
 }
 .list_container{
-    background-color: lavender;
-    border: 5px;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.3);
+    margin-bottom: 30px;
 
+}
+.list_container h3, .list_container h4{
+    color:white;
 }
 .todo_detail{
     float: left;
+    margin-top: 10px;
+}
+.todo_detail_right{
+    float: right;
+    margin-top: 10px;
 }
 .box{
     margin-top: 5px;
@@ -29,6 +38,16 @@ body {
     width: 60%;
 }
 .finished-checkbox{
+    margin-top: -10px;
     width: 40px;
     height: 40px;
+}
+
+.title_bar{
+    background-color:black;
+    border-radius: 5px;
+}
+
+.btn-op{
+    border-radius: 5px;
 }
